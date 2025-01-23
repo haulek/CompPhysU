@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from scipy import *
-from numpy import *
-from pylab import *
+import numpy as np
+import pylab as pl
 from matplotlib.colors import LogNorm
 import matplotlib.cm as cm
 import time
@@ -9,7 +8,7 @@ from numba import jit  # This is the new line with numba
         
 @jit(nopython=True)    # This is the second new line with numba
 def MandNumba(ext, max_steps, Nx, Ny):
-    data = ones( (Nx,Ny) )*max_steps
+    data = np.ones( (Nx,Ny) )*max_steps
     for i in range(Nx):
         for j in range(Ny):
             x = ext[0] + (ext[1]-ext[0])*i/(Nx-1.)
@@ -29,7 +28,7 @@ def ax_update(ax):  # actual plotting routine
     xstart, ystart, xdelta, ydelta = ax.viewLim.bounds
     xend = xstart + xdelta
     yend = ystart + ydelta
-    ext=array([xstart,xend,ystart,yend])
+    ext=np.array([xstart,xend,ystart,yend])
     data = MandNumba(ext, max_steps, Nx, Ny) # actually producing new fractal
     
     # Update the image object with our new data and extent
@@ -46,15 +45,15 @@ if __name__ == '__main__':
     ext = [-2,1,-1,1]
     
     t0 = time.time()    
-    data = MandNumba(array(ext), max_steps, Nx, Ny)
+    data = MandNumba(np.array(ext), max_steps, Nx, Ny)
     t1 = time.time()
-    print('Python: ', t1-t0)
+    print('Python: ', t1-t0, 's')
 
     #imshow(1./data, extent=ext)
-    fig,ax=subplots(1,1)
+    fig,ax=pl.subplots(1,1)
     ax.imshow(data, extent=ext,aspect='equal',origin='lower',cmap=cm.hot,norm=LogNorm())
     
     ax.callbacks.connect('xlim_changed', ax_update)
     ax.callbacks.connect('ylim_changed', ax_update)
     
-    show()
+    pl.show()
